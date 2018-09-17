@@ -184,7 +184,7 @@ public class CobolC extends Task implements Serializable {
                 Object obj = iter.next();
                 FileResource fcbl = (FileResource) obj;
                 cbls = fcbl.getFile().getAbsolutePath();
-                ints = srcToBuild(srcToExt(cbls, ".int"));
+                ints = srcToBuild(srcToExt(cbls, ".so"));
                 FileResource fint = new FileResource(new File(ints));
 
                 try {
@@ -203,8 +203,8 @@ public class CobolC extends Task implements Serializable {
                     //   cpToDebug(new File(srcToExt(cbls, ".CBL")));
                     mvToDebug(new File(srcToExt(cbls, ".lst")));
                     mvToDebug(new File(srcToExt(cbls, ".idy")));
-                    cpToDebug(new File(srcToExt(cbls, ".int")));
-                    mvToBuild(new File(srcToExt(cbls, ".int")));
+                    cpToDebug(new File(srcToExt(cbls, ".so")));
+                    mvToBuild(new File(srcToExt(cbls, ".so")));
 
                 }
             }
