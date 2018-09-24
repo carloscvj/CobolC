@@ -30,9 +30,9 @@ public class CobolC extends Task implements Serializable {
 
     private final List<FileSet> filesets = new ArrayList();
     private String srcDir = "src";
-    private String buildDir = "dist/exe";
-    private String debugDir = "debug/exe";
-    private String cobcompiler = "/usr/bin/cobol";
+    private String buildDir = "target/classes/exe";
+    private String debugDir = "target/classes/exe";
+    private String cobcompiler = "cobc -std=mf";
     private String cobdir = "/opt/lib/cobol";
     private String ld_library_path = "/opt/lib/cobol/coblib";
     private String cobcpy;
@@ -91,10 +91,12 @@ public class CobolC extends Task implements Serializable {
     }
 
     private void mvToBuild(File src) {
-        if (src.exists()) {
-            File f = new File(srcToBuild(src.getAbsolutePath()));
+        String so = src.getName();
+        File fso = new File(so);
+        if (fso.exists()) {
+            File f = new File("target/lib/" + so);
             f.getParentFile().mkdirs();
-            src.renameTo(f);
+            fso.renameTo(f);
         }
     }
     private boolean ter1 = false;
@@ -151,13 +153,15 @@ public class CobolC extends Task implements Serializable {
 
     private String[] getEnv() {
         Properties prop = new Properties();
-        prop.setProperty("COBDIR", getCobdir());
-        prop.setProperty("LD_LIBRARY_PATH", getLd_library_path());
-        prop.setProperty("COBCPY", getCobcpy());
+        prop.setProperty("PATH", System.getenv("PATH"));
+        //prop.setProperty("COBDIR", getCobdir());
+        //prop.setProperty("LD_LIBRARY_PATH", getLd_library_path());
+        prop.setProperty("COB_COPY_DIR", getCobcpy());
         Object hay[] = prop.entrySet().toArray();
         String ret[] = new String[hay.length];
         for (int i = 0; i < hay.length; i++) {
             ret[i] = hay[i].toString();
+            //System.out.println(ret[i]);
         }
         return ret;
     }
@@ -165,11 +169,9 @@ public class CobolC extends Task implements Serializable {
     @Override
     public void execute() {
 
-
         //System.setProperty("COBDIR", getCobdir());
         //System.setProperty("LD_LIBRARY_PATH", getLd_library_path());
         //System.setProperty("COBCPY", getCobcpy());
-
         String cbls;
         String ints;
 
@@ -184,8 +186,10 @@ public class CobolC extends Task implements Serializable {
                 Object obj = iter.next();
                 FileResource fcbl = (FileResource) obj;
                 cbls = fcbl.getFile().getAbsolutePath();
-                ints = srcToBuild(srcToExt(cbls, ".so"));
-                FileResource fint = new FileResource(new File(ints));
+                ints = srcToExt(fcbl.getFile().getName(), ".so");
+                File fints = new File("target/lib/" + ints);
+                FileResource fint = new FileResource(fints);
+                        
 
                 try {
                     if (fint.getLastModified() < fcbl.getLastModified()) {
